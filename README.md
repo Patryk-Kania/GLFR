@@ -22,3 +22,18 @@ This project is written in C++11 and built using CMake. It uses:
 The project is designed to build and run on both **Linux** and **Windows**.
 
 > macOS is explicitly unsupported due to OpenGL deprecation and personal preference.
+
+## Progress
+### GLFR v0.1.0
+- Mesh class to easily initialize meshes
+- Renderer class to setup and control camera and draw meshes (I guess thats two goals already?)
+- GLFR supports single camera (And thats one more goal)
+- There is currently one built-in shader that draws evertything in baby blue (it looks nice)
+![image](https://github.com/user-attachments/assets/d69cf779-8ddf-43ee-9317-0fa5bfb9f145)
+## Whats next:
+**Materials**
+- Create new materials
+- Built-in default material
+- Set materials for meshes
+- Normals and UVs
+- Texture Mapping
