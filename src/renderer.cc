@@ -1,6 +1,30 @@
 #include "GLFR/renderer.hh"
 
 #include <GL/glew.h>
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
+#include <glm/trigonometric.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
+
+#include "GLFR/shader.hh"
+
+const char *vertexShaderSource = 
+"#version 330 core\n"
+"layout (location = 0) in vec3 vertexPos;\n"
+"uniform mat4 mvpMatrix;"
+"void main()\n"
+"{\n"
+"   gl_Position = mvpMatrix * vec4(vertexPos, 1.0);\n"
+"}\0";
+
+const char *fragmentShaderSource = 
+"#version 330 core\n"
+"out vec4 fragColor;\n"
+"void main()\n"
+"{\n"
+"   fragColor = vec4(0.54f, 0.81f, 0.94f, 1.0f);\n"
+"}\n\0";
 
 namespace glfr
 {
@@ -8,6 +32,18 @@ namespace glfr
 	{
 		glViewport(0, 0, viewportWidth, viewportHeight);
 		glEnable(GL_DEPTH_TEST);
+
+		m_camera.position = glm::vec3 {0.f, 0.f, 0.f};
+		m_camera.rotation = glm::vec3 {0.f, 0.f, 0.f};
+		m_camera.FOV = 60;
+		m_camera.aspectRatio = (float)viewportWidth/ (float)viewportHeight;
+		m_camera.nearClipPlane = 0.01f;
+		m_camera.farClipPlane = 100.f;
+
+		CalculateViewMatrix();
+		CalculateProjectionMatrix();
+
+		m_defaultShader.LoadFromSources(vertexShaderSource, fragmentShaderSource);
 	}
 
 	void Renderer::ClearColor(const int r, const int g, const int b)
@@ -24,5 +60,70 @@ namespace glfr
 	void Renderer::ClearDepth()
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+
+	void Renderer::SetCameraPosition(glm::vec3 newPosition)
+	{
+		m_camera.position = newPosition;
+		CalculateViewMatrix();
+	}
+
+	void Renderer::TranslateCamera(glm::vec3 translation)
+	{
+		m_camera.position += translation;
+		CalculateViewMatrix();
+	}
+
+	void Renderer::SetCameraRotation(glm::vec3 newRotation)
+	{
+		m_camera.rotation = newRotation;
+		CalculateViewMatrix();
+	}
+
+	void Renderer::RotateCamera(glm::vec3 rotation)
+	{
+		m_camera.rotation += rotation;
+		CalculateViewMatrix();
+	}
+
+	void Renderer::SetCameraFOV(float fov)
+	{
+		m_camera.FOV = fov;
+		CalculateProjectionMatrix();
+	}
+
+	void Renderer::SetCameraClipDistance(float near, float far)
+	{
+		m_camera.nearClipPlane = near;
+		m_camera.farClipPlane = far;
+		CalculateProjectionMatrix();
+	}
+	
+	void Renderer::DrawMesh(Mesh &mesh, glm::mat4 transform)
+	{
+		m_defaultShader.Use();
+
+		glm::mat4 mvpMatrix = m_projectionMatrix * m_viewMatrix * transform;
+
+		m_defaultShader.SetUniformValue("mvpMatrix", mvpMatrix);
+
+		glBindVertexArray(mesh.GetVAO());
+		glDrawElements(GL_TRIANGLES, mesh.GetNumOfTriangles() * 3, GL_UNSIGNED_INT, nullptr);
+	}
+
+
+	void Renderer::CalculateViewMatrix()
+	{
+		m_viewMatrix = glm::mat4(1.0f);
+		m_viewMatrix = glm::translate(m_viewMatrix, m_camera.position);
+		m_viewMatrix = glm::rotate(m_viewMatrix, glm::radians(m_camera.rotation.x), glm::vec3{1.f,0.f,0.f});
+		m_viewMatrix = glm::rotate(m_viewMatrix, glm::radians(m_camera.rotation.y), glm::vec3{0.f,1.f,0.f});
+		m_viewMatrix = glm::rotate(m_viewMatrix, glm::radians(m_camera.rotation.z), glm::vec3{0.f,0.f,1.f});
+	}
+
+	void Renderer::CalculateProjectionMatrix()
+	{
+		m_projectionMatrix = glm::perspective(glm::radians(m_camera.FOV), m_camera.aspectRatio,
+						      m_camera.nearClipPlane, m_camera.farClipPlane);
 	}
 }

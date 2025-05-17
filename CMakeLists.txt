@@ -16,7 +16,7 @@ find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 
-add_library(glfr STATIC src/renderer.cc include/GLFR/renderer.hh)
+add_library(glfr STATIC src/renderer.cc src/shader.cc src/mesh.cc)
 target_include_directories(glfr PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
 				PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/src")
 
