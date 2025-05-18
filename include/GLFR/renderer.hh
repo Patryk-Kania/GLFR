@@ -12,20 +12,20 @@ namespace glfr
 	class Renderer
 	{
 	public:
-		void Init(const int viewportWidth, const int viewportHeight);
+		void Init( const int viewportWidth, const int viewportHeight );
 
-		void ClearColor(const int r, const int g, const int b);
-		void ClearColor(const int c);
+		void ClearColor( const int r, const int g, const int b );
+		void ClearColor( const int c );
 		void ClearDepth();
 
-		void SetCameraPosition(glm::vec3 newPosition);
-		void TranslateCamera(glm::vec3 translation);
-		void SetCameraRotation(glm::vec3 newRotation);
-		void RotateCamera(glm::vec3 rotation);
-		void SetCameraFOV(float fov);
-		void SetCameraClipDistance(float near, float far);
+		void SetCameraPosition( const glm::vec3 &newPosition );
+		void TranslateCamera( const glm::vec3 &translation );
+		void SetCameraRotation( const glm::vec3 &newRotation );
+		void RotateCamera( const glm::vec3 &rotation );
+		void SetCameraFOV( const float fov );
+		void SetCameraClipDistance( const float near, const float far );
 
-		void DrawMesh(Mesh &mesh, glm::mat4 transform);
+		void DrawMesh( const Mesh &mesh, const glm::mat4 &transform );
 
 	private:
 		struct

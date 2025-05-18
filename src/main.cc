@@ -19,14 +19,14 @@ int main()
 {
 	glfwInit();
 
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	GLFWwindow *window = glfwCreateWindow(g_kWindowWidth, g_kWindowHeight, "GLFR v" GLFR_VERSION_STRING " test", nullptr, nullptr);
+	glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );
+	GLFWwindow *window = glfwCreateWindow( g_kWindowWidth, g_kWindowHeight, "GLFR v" GLFR_VERSION_STRING " test", nullptr, nullptr );
 
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent( window );
 	glewInit();
 
 	glfr::Renderer renderer;
-	renderer.Init(g_kWindowWidth, g_kWindowHeight);
+	renderer.Init( g_kWindowWidth, g_kWindowHeight );
 
 	float vertices[] = {
 		0.5f,  0.5f, 0.0f,  // top right
@@ -40,14 +40,14 @@ int main()
 		1, 2, 3   // second Triangle
 	};
 
-	glfr::Mesh mesh(4, vertices, 2, triangles);
+	glfr::Mesh mesh( 4, vertices, 2, triangles );
 
 	float lastTime = 0.0f;
 	float deltaTime = 0.0f;
 
 	float rotationY = 0;
 
-	while(!glfwWindowShouldClose(window))
+	while( !glfwWindowShouldClose( window ) )
 	{
 		float currentTime = glfwGetTime();
 		deltaTime = currentTime - lastTime;
@@ -55,18 +55,18 @@ int main()
 
 		glfwPollEvents();
 
-		renderer.ClearColor(53);
+		renderer.ClearColor( 53 );
 		renderer.ClearDepth();
 
-		rotationY += glm::radians(45.f) * deltaTime;
+		rotationY += glm::radians( 45.f ) * deltaTime;
 
 		glm::mat4 meshTransform = glm::mat4 { 1.0f };
-		meshTransform = glm::translate(meshTransform, glm::vec3 { 0.0f, 0.0f, -2.0f });
-		meshTransform = glm::rotate(meshTransform, rotationY, glm::vec3 { 0.f, 1.f, 0.f});
+		meshTransform = glm::translate( meshTransform, glm::vec3 { 0.0f, 0.0f, -2.0f } );
+		meshTransform = glm::rotate( meshTransform, rotationY, glm::vec3 { 0.f, 1.f, 0.f } );
 
-		renderer.DrawMesh(mesh, meshTransform);
+		renderer.DrawMesh( mesh, meshTransform );
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers( window );
 	}
 
 	glfwTerminate();

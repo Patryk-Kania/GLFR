@@ -8,8 +8,8 @@ namespace glfr
 	class Mesh
 	{
 	public:
-		Mesh(const int numOfVertices, const GLfloat *vertices,
-		     const int numOfTriangles, const GLuint *triangles);
+		Mesh( const int numOfVertices, const GLfloat *vertices,
+		     const int numOfTriangles, const GLuint *triangles );
 		~Mesh();
 
 		GLuint GetVAO() const;
