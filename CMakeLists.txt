@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(GLFR	VERSION 0.1.3
+project(GLFR	VERSION 0.2.0
 		DESCRIPTION "OpenGL Forward Renderer"
 		LANGUAGES CXX
 	)
@@ -16,7 +16,7 @@ find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 
-add_library(glfr STATIC src/renderer.cc src/shader.cc src/mesh.cc)
+add_library(glfr STATIC src/renderer.cc src/shader.cc src/mesh.cc src/material.cc)
 target_include_directories(glfr PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
 				PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/src")
 

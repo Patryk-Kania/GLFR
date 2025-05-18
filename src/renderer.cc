@@ -8,6 +8,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 
 #include "GLFR/shader.hh"
+#include "GLFR/material.hh"
 
 const char *vertexShaderSource = 
 "#version 330 core\n"
@@ -15,16 +16,23 @@ const char *vertexShaderSource =
 "uniform mat4 mvpMatrix;"
 "void main()\n"
 "{\n"
-"   gl_Position = mvpMatrix * vec4(vertexPos, 1.0);\n"
+"	gl_Position = mvpMatrix * vec4(vertexPos, 1.0);\n"
 "}\0";
 
 const char *fragmentShaderSource = 
 "#version 330 core\n"
+"struct Material\n"
+"{\n"
+"	vec3 baseColor;"
+"};\n"
+"uniform Material material;"
 "out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
-"   fragColor = vec4(0.54f, 0.81f, 0.94f, 1.0f);\n"
+"	fragColor = vec4(material.baseColor, 1.0f);\n"
 "}\n\0";
+
+#include <cstdio>
 
 namespace glfr
 {
@@ -106,6 +114,7 @@ namespace glfr
 		glm::mat4 mvpMatrix = m_projectionMatrix * m_viewMatrix * transform;
 
 		m_defaultShader.SetUniformValue( "mvpMatrix", mvpMatrix );
+		m_defaultShader.SetUniformValue( "material.baseColor", mesh.GetAttachedMaterial().GetBaseColor() );
 
 		glBindVertexArray( mesh.GetVAO() );
 		glDrawElements( GL_TRIANGLES, mesh.GetNumOfTriangles() * 3, GL_UNSIGNED_INT, nullptr );

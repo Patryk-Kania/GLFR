@@ -42,6 +42,10 @@ int main()
 
 	glfr::Mesh mesh( 4, vertices, 2, triangles );
 
+	glfr::Material meshMaterial { 255, 117, 33 };
+	mesh.AttachMaterial(meshMaterial);
+
+
 	float lastTime = 0.0f;
 	float deltaTime = 0.0f;
 

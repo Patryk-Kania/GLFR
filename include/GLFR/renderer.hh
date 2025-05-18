@@ -1,11 +1,14 @@
 #ifndef GLFR_RENDERER_HH
 #define GLFR_RENDERER_HH
 
+#include <map>
+
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
 #include "mesh.hh"
 #include "shader.hh"
+#include "material.hh"
 
 namespace glfr
 {
