@@ -9,6 +9,7 @@ namespace glfr
 	Material::Material( const int r, const int g, const int b )
 	{
 		SetBaseColor( r, g, b );
+		m_albedoTexture = Texture2D::GetDefaultTextureHandle();
 	}
 
 	void Material::SetBaseColor( const int r, const int g, const int b )

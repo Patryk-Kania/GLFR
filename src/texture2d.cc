@@ -6,6 +6,7 @@
 
 namespace glfr
 {
+	Texture2D* Texture2D::s_defaultTexture = nullptr;
 
 	Texture2D::~Texture2D()
 	{
@@ -45,6 +46,35 @@ namespace glfr
 	Texture2D Texture2D::SingleColor( const GLubyte c )
 	{
 		return SingleColor( c, c, c );
+	}
+	
+	GLuint Texture2D::GetDefaultTextureHandle()
+	{
+		if(!s_defaultTexture)
+		{
+			Texture2D *texture = new Texture2D;
+			glCreateTextures( GL_TEXTURE_2D, 1, &texture->m_texture );
+
+			glTextureParameteri( texture->m_texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+			glTextureParameteri( texture->m_texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+			glTextureParameteri( texture->m_texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+			glTextureParameteri( texture->m_texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
+			const GLubyte pixels[] = 
+			{
+				255, 255, 255, 255,
+				255, 255, 255, 255,
+				255, 255, 255, 255,
+				255, 255, 255, 255,
+			};
+
+			glTextureStorage2D( texture->m_texture, 1, GL_RGBA8, 2, 2 );
+			glTextureSubImage2D( texture->m_texture, 0, 0, 0, 2, 2, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+
+			s_defaultTexture = texture;
+		}
+
+		return s_defaultTexture->GetTextureHandle();
 	}
 
 	

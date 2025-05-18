@@ -21,7 +21,7 @@ namespace glfr
 		GLuint GetAlbedoTextureHandle() const;
 	private:
 		glm::vec3 m_baseColor;
-		GLuint m_albedoTexture;
+		GLuint m_albedoTexture { 0 };
 	};
 }
 

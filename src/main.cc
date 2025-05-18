@@ -51,22 +51,6 @@ int main()
 
 	glfr::Mesh mesh( 4, vertices, UVs, 2, triangles );
 	
-	glfr::Material meshMaterial;
-
-	GLubyte pixels[] = 
-	{
-		255, 0, 255, 255,
-		0, 0, 0, 255,
-		0, 0, 0, 255,
-		255, 0, 255, 255,
-	};
-
-	glfr::Texture2D meshAlbedo = glfr::Texture2D::CreateFromPixelArray( 2, 2, pixels );
-	meshMaterial.SetAlbedoTexture(meshAlbedo);
-
-	mesh.AttachMaterial(meshMaterial);
-
-
 	float lastTime = 0.0f;
 	float deltaTime = 0.0f;
 

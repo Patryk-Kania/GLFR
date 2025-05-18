@@ -14,11 +14,14 @@ namespace glfr
 		static Texture2D SingleColor( const GLubyte r, const GLubyte g, const GLubyte b );
 		static Texture2D SingleColor( const GLubyte c );
 
+		static GLuint GetDefaultTextureHandle();
+
 		GLuint GetTextureHandle() const;
 
 	private:
 		Texture2D() = default;
 		GLuint m_texture;
+		static Texture2D *s_defaultTexture;
 	};
 }
 
