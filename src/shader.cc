@@ -196,19 +196,19 @@ namespace glfr
 	void Shader::SetUniformValue( const char *name, const glm::vec4 &value )
 	{
 		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
-		glUniform4fv( uniformLocation, 4, &value[0] );
+		glUniform4fv( uniformLocation, 1, &value[0] );
 	}
 
 	void Shader::SetUniformValue( const char *name, const glm::vec3 &value ) 
 	{
 		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
-		glUniform3fv( uniformLocation, 3, &value[0] );
+		glUniform3fv( uniformLocation, 1, &value[0] );
 	}
 
 	void Shader::SetUniformValue( const char *name, const glm::vec2 &value ) 
 	{
 		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
-		glUniform2fv( uniformLocation, 2, &value[0] );
+		glUniform2fv( uniformLocation, 1, &value[0] );
 	}
 
 	void Shader::SetUniformValue( const char *name, const float x, const float y, const float z, const float w ) 
