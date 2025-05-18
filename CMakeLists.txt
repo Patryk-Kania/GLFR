@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(GLFR	VERSION 0.1.2
+project(GLFR	VERSION 0.1.3
 		DESCRIPTION "OpenGL Forward Renderer"
 		LANGUAGES CXX
 	)
