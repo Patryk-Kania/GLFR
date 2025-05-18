@@ -30,10 +30,21 @@ The project is designed to build and run on both **Linux** and **Windows**.
 - GLFR supports single camera (And thats one more goal)
 - There is currently one built-in shader that draws evertything in baby blue (it looks nice)
 ![image](https://github.com/user-attachments/assets/d69cf779-8ddf-43ee-9317-0fa5bfb9f145)
+
+### GLFR v0.2.0
+...
+I might’ve messed up versioning a bit, so I’m skipping v0.2.0.
+
+### GLFR v0.3.0
+- Built-in meshes: quad and cube (I'll check it as a completed goal)
+- Materials - can set base color and albedo texture (Partialy finished another goal)
+- Texture mapping - can create textures from pixel array
+![image](https://github.com/user-attachments/assets/04d65cb2-1c13-4e74-b134-5bbe4e28657d)
+
 ## Whats next:
-**Materials**
-- Create new materials
-- Built-in default material
-- Set materials for meshes
-- Normals and UVs
-- Texture Mapping
+**Lights**
+- Default always active directional light
+- Control directional light properties
+- Create new lights: point and spot
+- Materials with properties to control how light affects the object
+- Support Multiple light sources
