@@ -83,7 +83,7 @@ namespace glfr
 		GLuint vertexShader = CreateShaderFromSource( GL_VERTEX_SHADER, vertexShaderSource );
 		if( !vertexShader )
 		{
-			fputs( "Failed to create vertex Shader", stderr );
+			fputs( "Failed to create vertex Shader\n", stderr );
 			return false;
 		}
 
@@ -91,7 +91,7 @@ namespace glfr
 		if( !fragmentShader )
 		{
 			glDeleteShader( vertexShader );
-			fputs( "Failed to create fragment Shader", stderr );
+			fputs( "Failed to create fragment Shader\n", stderr );
 			return false;
 		}
 

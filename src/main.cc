@@ -11,6 +11,7 @@
 #include "GLFR/config.hh"
 #include "GLFR/mesh.hh"
 #include "GLFR/renderer.hh"
+#include "GLFR/texture2d.hh"
 
 constexpr int g_kWindowWidth = 1200;
 constexpr int g_kWindowHeight = 800;
@@ -28,21 +29,32 @@ int main()
 	glfr::Renderer renderer;
 	renderer.Init( g_kWindowWidth, g_kWindowHeight );
 
-	float vertices[] = {
+	GLfloat vertices[] = {
 		0.5f,  0.5f, 0.0f,  // top right
 		0.5f, -0.5f, 0.0f,  // bottom right
 		-0.5f, -0.5f, 0.0f,  // bottom left
 		-0.5f,  0.5f, 0.0f   // top left 
 	};
 
-	unsigned int triangles[] = {  // note that we start from 0!
+	GLfloat UVs[] =
+	{
+		1.0f, 1.0f,
+		1.0f, 0.0f,
+		0.0f, 0.0f,
+		0.0f, 1.0f
+	};
+
+	GLuint triangles[] = {  // note that we start from 0!
 		0, 1, 3,  // first Triangle
 		1, 2, 3   // second Triangle
 	};
 
-	glfr::Mesh mesh( 4, vertices, 2, triangles );
+	glfr::Mesh mesh( 4, vertices, UVs, 2, triangles );
+	
+	glfr::Material meshMaterial { 255, 0, 255 };
+	glfr::Texture2D meshAlbedo = glfr::Texture2D::RGB( 255 );
+	meshMaterial.SetAlbedoTexture(meshAlbedo);
 
-	glfr::Material meshMaterial { 255, 117, 33 };
 	mesh.AttachMaterial(meshMaterial);
 
 

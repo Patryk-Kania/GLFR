@@ -13,7 +13,9 @@
 const char *vertexShaderSource = 
 "#version 330 core\n"
 "layout (location = 0) in vec3 vertexPos;\n"
+"layout (location = 1) in vec2 uv;"
 "uniform mat4 mvpMatrix;"
+"out vec2 uvCoords;"
 "void main()\n"
 "{\n"
 "	gl_Position = mvpMatrix * vec4(vertexPos, 1.0);\n"
@@ -23,16 +25,16 @@ const char *fragmentShaderSource =
 "#version 330 core\n"
 "struct Material\n"
 "{\n"
-"	vec3 baseColor;"
+"	vec3 baseColor;\n"
 "};\n"
+"in vec2 uvCoords;"
 "uniform Material material;"
+"uniform sampler2D albedo;"
 "out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
-"	fragColor = vec4(material.baseColor, 1.0f);\n"
+"	fragColor = texture(albedo, uvCoords) * vec4(material.baseColor, 1.0f);\n"
 "}\n\0";
-
-#include <cstdio>
 
 namespace glfr
 {
@@ -115,6 +117,8 @@ namespace glfr
 
 		m_defaultShader.SetUniformValue( "mvpMatrix", mvpMatrix );
 		m_defaultShader.SetUniformValue( "material.baseColor", mesh.GetAttachedMaterial().GetBaseColor() );
+
+		glBindTextureUnit(0, mesh.GetAttachedMaterial().GetAlbedoTextureHandle());
 
 		glBindVertexArray( mesh.GetVAO() );
 		glDrawElements( GL_TRIANGLES, mesh.GetNumOfTriangles() * 3, GL_UNSIGNED_INT, nullptr );

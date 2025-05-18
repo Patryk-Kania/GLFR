@@ -10,7 +10,7 @@ namespace glfr
 	class Mesh
 	{
 	public:
-		Mesh( const int numOfVertices, const GLfloat *vertices,
+		Mesh( const int numOfVertices, const GLfloat *vertices, const GLfloat *UVs,
 		     const int numOfTriangles, const GLuint *triangles );
 		~Mesh();
 
