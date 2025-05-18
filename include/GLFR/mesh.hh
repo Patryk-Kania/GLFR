@@ -14,6 +14,9 @@ namespace glfr
 		     const int numOfTriangles, const GLuint *triangles );
 		~Mesh();
 
+		static Mesh NewQuad();
+		static Mesh NewCube();
+
 		void AttachMaterial(Material material);
 
 		GLuint GetVAO() const;

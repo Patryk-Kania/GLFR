@@ -29,27 +29,7 @@ int main()
 	glfr::Renderer renderer;
 	renderer.Init( g_kWindowWidth, g_kWindowHeight );
 
-	GLfloat vertices[] = {
-		0.5f,  0.5f, 0.0f,  // top right
-		0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left 
-	};
-
-	GLfloat UVs[] =
-	{
-		1.0f, 1.0f,
-		1.0f, 0.0f,
-		0.0f, 0.0f,
-		0.0f, 1.0f
-	};
-
-	GLuint triangles[] = {  // note that we start from 0!
-		0, 1, 3,  // first Triangle
-		1, 2, 3   // second Triangle
-	};
-
-	glfr::Mesh mesh( 4, vertices, UVs, 2, triangles );
+	glfr::Mesh mesh = glfr::Mesh::NewCube();
 	
 	float lastTime = 0.0f;
 	float deltaTime = 0.0f;

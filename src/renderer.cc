@@ -35,6 +35,7 @@ const char *fragmentShaderSource =
 "void main()\n"
 "{\n"
 "	fragColor = texture(albedo, uvCoords) * vec4(material.baseColor, 1.0f);\n"
+"	//fragColor = vec4(uvCoords, 0.0, 1.0);\n"
 "}\n\0";
 
 namespace glfr
