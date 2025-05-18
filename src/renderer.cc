@@ -12,12 +12,13 @@
 
 const char *vertexShaderSource = 
 "#version 330 core\n"
-"layout (location = 0) in vec3 vertexPos;\n"
-"layout (location = 1) in vec2 uv;"
+"layout ( location = 0 ) in vec3 vertexPos;\n"
+"layout ( location = 1 ) in vec2 uv;"
 "uniform mat4 mvpMatrix;"
 "out vec2 uvCoords;"
 "void main()\n"
 "{\n"
+"	uvCoords = uv;"
 "	gl_Position = mvpMatrix * vec4(vertexPos, 1.0);\n"
 "}\0";
 

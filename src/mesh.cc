@@ -1,7 +1,5 @@
 #include "GLFR/mesh.hh"
 
-#include <cstdio>
-
 #include <GL/glew.h>
 
 namespace glfr
@@ -25,8 +23,8 @@ namespace glfr
 			vertexData[vertexIndex + 1] = vertices[positionIndex + 1]; 
 			vertexData[vertexIndex + 2] = vertices[positionIndex + 2]; 
 
-			vertexData[vertexIndex + 3] = vertices[UVIndex + 0]; 
-			vertexData[vertexIndex + 4] = vertices[UVIndex + 1]; 
+			vertexData[vertexIndex + 3] = UVs[UVIndex + 0]; 
+			vertexData[vertexIndex + 4] = UVs[UVIndex + 1]; 
 		}
 
 		glNamedBufferStorage( m_VBO, sizeof(GLfloat) * numOfVertices * (3 + 2), vertexData, 0 );

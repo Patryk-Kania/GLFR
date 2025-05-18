@@ -10,8 +10,9 @@ namespace glfr
 	public:
 		~Texture2D();
 
-		static Texture2D RGB( const GLubyte r, const GLubyte g, const GLubyte b );
-		static Texture2D RGB( const GLubyte c );
+		static Texture2D CreateFromPixelArray( const int width, const int height, const GLubyte *pixels );
+		static Texture2D SingleColor( const GLubyte r, const GLubyte g, const GLubyte b );
+		static Texture2D SingleColor( const GLubyte c );
 
 		GLuint GetTextureHandle() const;
 
