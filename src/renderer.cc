@@ -119,6 +119,7 @@ namespace glfr
 		m_viewMatrix = glm::rotate(m_viewMatrix, glm::radians(m_camera.rotation.x), glm::vec3{1.f,0.f,0.f});
 		m_viewMatrix = glm::rotate(m_viewMatrix, glm::radians(m_camera.rotation.y), glm::vec3{0.f,1.f,0.f});
 		m_viewMatrix = glm::rotate(m_viewMatrix, glm::radians(m_camera.rotation.z), glm::vec3{0.f,0.f,1.f});
+		m_viewMatrix = glm::inverse(m_viewMatrix);
 	}
 
 	void Renderer::CalculateProjectionMatrix()

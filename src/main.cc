@@ -6,6 +6,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/trigonometric.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 #include "GLFR/config.hh"
 #include "GLFR/mesh.hh"
@@ -41,10 +42,10 @@ int main()
 
 	glfr::Mesh mesh(4, vertices, 2, triangles);
 
-	renderer.SetCameraPosition(glm::vec3 {0.0f, 0.0f, -2.0f});
-
 	float lastTime = 0.0f;
 	float deltaTime = 0.0f;
+
+	float rotationY = 0;
 
 	while(!glfwWindowShouldClose(window))
 	{
@@ -57,8 +58,13 @@ int main()
 		renderer.ClearColor(53);
 		renderer.ClearDepth();
 
-		renderer.DrawMesh(mesh, glm::mat4 {1.0});
-		renderer.RotateCamera(glm::vec3 {0.0f, deltaTime * 45, 0.0f});
+		rotationY += glm::radians(45.f) * deltaTime;
+
+		glm::mat4 meshTransform = glm::mat4 { 1.0f };
+		meshTransform = glm::translate(meshTransform, glm::vec3 { 0.0f, 0.0f, -2.0f });
+		meshTransform = glm::rotate(meshTransform, rotationY, glm::vec3 { 0.f, 1.f, 0.f});
+
+		renderer.DrawMesh(mesh, meshTransform);
 
 		glfwSwapBuffers(window);
 	}
