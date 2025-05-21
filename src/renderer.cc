@@ -117,7 +117,7 @@ namespace glfr
 		glm::mat4 mvpMatrix = m_projectionMatrix * m_viewMatrix * transform;
 
 		m_defaultShader.SetUniformValue( "mvpMatrix", mvpMatrix );
-		m_defaultShader.SetUniformValue( "material.diffuseColor", mesh.material.diffuseColor );
+		m_defaultShader.SetUniformValue( "material.diffuseColor", mesh.material.diffuseColor.ToVec3() );
 
 		glBindVertexArray( mesh.GetVAO() );
 		glDrawElements( GL_TRIANGLES, mesh.GetNumOfTriangles() * 3, GL_UNSIGNED_INT, nullptr );

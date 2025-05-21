@@ -31,7 +31,7 @@ int main()
 	renderer.Init( g_kWindowWidth, g_kWindowHeight );
 
 	glfr::Mesh mesh = glfr::Mesh::NewCube();
-	mesh.material.diffuseColor = glfr::Color::RGB( 255, 0, 255 );
+	mesh.material.diffuseColor = glfr::Color::Cyan();
 	
 	float lastTime = 0.0f;
 	float deltaTime = 0.0f;

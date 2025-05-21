@@ -1,18 +1,17 @@
 #ifndef GLFR_MATERIAL_HH
 #define GLFR_MATERIAL_HH
 
-#include <glm/vec3.hpp>
-
 #include "texture2d.hh"
+#include "color.hh"
 
 namespace glfr
 {
 	struct Material
 	{
-		glm::vec3 ambientColor;
-		glm::vec3 diffuseColor;
-		glm::vec3 specularColor;
-		glm::vec3 emissiveColor;
+		Color ambientColor;
+		Color diffuseColor;
+		Color specularColor;
+		Color emissiveColor;
 		float opacity;
 		float specularPower;
 		float alphaThreshold;
