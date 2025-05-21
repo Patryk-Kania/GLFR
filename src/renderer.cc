@@ -26,15 +26,14 @@ const char *fragmentShaderSource =
 "#version 330 core\n"
 "struct Material\n"
 "{\n"
-"	vec3 baseColor;\n"
+"	vec3 diffuseColor;\n"
 "};\n"
 "in vec2 uvCoords;"
 "uniform Material material;"
-"uniform sampler2D albedo;"
 "out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
-"	fragColor = texture(albedo, uvCoords) * vec4(material.baseColor, 1.0f);\n"
+"	fragColor = vec4(material.diffuseColor, 1.0f);\n"
 "	//fragColor = vec4(uvCoords, 0.0, 1.0);\n"
 "}\n\0";
 
@@ -118,9 +117,7 @@ namespace glfr
 		glm::mat4 mvpMatrix = m_projectionMatrix * m_viewMatrix * transform;
 
 		m_defaultShader.SetUniformValue( "mvpMatrix", mvpMatrix );
-		m_defaultShader.SetUniformValue( "material.baseColor", mesh.GetAttachedMaterial().GetBaseColor() );
-
-		glBindTextureUnit(0, mesh.GetAttachedMaterial().GetAlbedoTextureHandle());
+		m_defaultShader.SetUniformValue( "material.diffuseColor", mesh.material.diffuseColor );
 
 		glBindVertexArray( mesh.GetVAO() );
 		glDrawElements( GL_TRIANGLES, mesh.GetNumOfTriangles() * 3, GL_UNSIGNED_INT, nullptr );

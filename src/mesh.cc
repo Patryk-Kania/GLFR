@@ -191,11 +191,6 @@ namespace glfr
 		glDeleteBuffers( 1, &m_EBO );
 	}
 
-	void Mesh::AttachMaterial(Material material)
-	{
-		m_attachedMaterial = material;
-	}
-	
 	GLuint Mesh::GetVAO() const
 	{
 		return m_VAO;
@@ -204,10 +199,5 @@ namespace glfr
 	int Mesh::GetNumOfTriangles() const
 	{
 		return m_numOfTriangles;
-	}
-
-	Material Mesh::GetAttachedMaterial() const
-	{
-		return m_attachedMaterial;
 	}
 }

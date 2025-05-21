@@ -12,6 +12,7 @@
 #include "GLFR/mesh.hh"
 #include "GLFR/renderer.hh"
 #include "GLFR/texture2d.hh"
+#include "GLFR/color.hh"
 
 constexpr int g_kWindowWidth = 1200;
 constexpr int g_kWindowHeight = 800;
@@ -30,6 +31,7 @@ int main()
 	renderer.Init( g_kWindowWidth, g_kWindowHeight );
 
 	glfr::Mesh mesh = glfr::Mesh::NewCube();
+	mesh.material.diffuseColor = glfr::Color::RGB( 255, 0, 255 );
 	
 	float lastTime = 0.0f;
 	float deltaTime = 0.0f;

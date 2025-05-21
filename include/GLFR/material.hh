@@ -7,21 +7,23 @@
 
 namespace glfr
 {
-	class Material
+	struct Material
 	{
-	public:
-		Material( const int r, const int g, const int b );
-		Material( const int c) : Material( c, c, c) {}
-		Material() : Material( 255 ) {}
+		glm::vec3 ambientColor;
+		glm::vec3 diffuseColor;
+		glm::vec3 specularColor;
+		glm::vec3 emissiveColor;
+		float opacity;
+		float specularPower;
+		float alphaThreshold;
 
-		void SetBaseColor( const int r, const int g, const int b );
-		void SetAlbedoTexture( const Texture2D &texture );
-
-		glm::vec3 GetBaseColor() const;
-		GLuint GetAlbedoTextureHandle() const;
-	private:
-		glm::vec3 m_baseColor;
-		GLuint m_albedoTexture { 0 };
+		Texture2D ambientTexture;
+		Texture2D diffuseTexture;
+		Texture2D specularTexture;
+		Texture2D emissiveTexture;
+		Texture2D specularPowerTexture;
+		Texture2D opacityTexture;
+		Texture2D normalTexture;
 	};
 }
 

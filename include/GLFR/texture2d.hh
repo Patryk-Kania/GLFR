@@ -8,20 +8,27 @@ namespace glfr
 	class Texture2D
 	{
 	public:
+		Texture2D() : m_handle{ 0 }, m_refCount{ nullptr } {}
+		Texture2D( const Texture2D &other );
+		Texture2D( Texture2D &&other ) noexcept;
+
+		Texture2D& operator=( const Texture2D &other );
+		Texture2D& operator=( Texture2D &&other ) noexcept;
+
 		~Texture2D();
 
-		static Texture2D CreateFromPixelArray( const int width, const int height, const GLubyte *pixels );
-		static Texture2D SingleColor( const GLubyte r, const GLubyte g, const GLubyte b );
-		static Texture2D SingleColor( const GLubyte c );
+		static Texture2D FromPixelsRGBA( const GLubyte *pixels, const int width, const int height );
+		static Texture2D FromColorRGBA( const GLubyte r, const GLubyte g, const GLubyte b, const GLubyte a );
+		//static Texture2D FromFile( const char *file, const int width, const int height, const GLenum format );
 
-		static GLuint GetDefaultTextureHandle();
-
-		GLuint GetTextureHandle() const;
+		void Bind( GLenum unit = GL_TEXTURE0 ) const;
+		bool IsValid() const;
 
 	private:
-		Texture2D() = default;
-		GLuint m_texture;
-		static Texture2D *s_defaultTexture;
+		GLuint m_handle;
+		int *m_refCount;
+
+		void ReleaseHandle();
 	};
 }
 

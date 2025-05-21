@@ -10,6 +10,8 @@ namespace glfr
 	class Mesh
 	{
 	public:
+		Material material;
+
 		Mesh( const int numOfVertices, const GLfloat *vertices, const GLfloat *UVs,
 		     const int numOfTriangles, const GLuint *triangles );
 		~Mesh();
@@ -17,15 +19,11 @@ namespace glfr
 		static Mesh NewQuad();
 		static Mesh NewCube();
 
-		void AttachMaterial(Material material);
-
 		GLuint GetVAO() const;
 		int GetNumOfTriangles() const;
-		Material GetAttachedMaterial() const;
 	private:
 		GLuint m_VAO, m_VBO, m_EBO;
 		int m_numOfTriangles;
-		Material m_attachedMaterial;
 	};
 }
 
