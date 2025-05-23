@@ -4,20 +4,21 @@
 
 namespace glfr
 {
-	Mesh::Mesh( const int numOfVertices, const GLfloat *vertices, const GLfloat *UVs,
+	Mesh::Mesh( const int numOfVertices, const GLfloat *vertices, const GLfloat *UVs, const GLfloat *normals,
 		   const int numOfTriangles, const GLuint *triangles )
 	{
 		glCreateVertexArrays( 1, &m_VAO );
 		glCreateBuffers( 1, &m_VBO );
 		glCreateBuffers( 1, &m_EBO );
 
-		// 3 floats for position + 2 floats for UVs
-		GLfloat vertexData[numOfVertices * (3 + 2)];
+		// 3 floats for position + 2 floats for UVs + 3 floats for normals
+		GLfloat vertexData[numOfVertices * (3 + 2 + 3)];
 		for( int i = 0; i < numOfVertices; i++ )
 		{
-			int vertexIndex = i * 5;
+			int vertexIndex = i * 8;
 			int positionIndex = i * 3;
 			int UVIndex = i * 2;
+			int normalIndex = i * 3;
 
 			vertexData[vertexIndex + 0] = vertices[positionIndex + 0]; 
 			vertexData[vertexIndex + 1] = vertices[positionIndex + 1]; 
@@ -25,22 +26,30 @@ namespace glfr
 
 			vertexData[vertexIndex + 3] = UVs[UVIndex + 0]; 
 			vertexData[vertexIndex + 4] = UVs[UVIndex + 1]; 
+
+			vertexData[vertexIndex + 5] = normals[normalIndex + 0]; 
+			vertexData[vertexIndex + 6] = normals[normalIndex + 1]; 
+			vertexData[vertexIndex + 7] = normals[normalIndex + 2]; 
 		}
 
-		glNamedBufferStorage( m_VBO, sizeof(GLfloat) * numOfVertices * (3 + 2), vertexData, 0 );
+		glNamedBufferStorage( m_VBO, sizeof(vertexData), vertexData, 0 );
 		glNamedBufferStorage( m_EBO, sizeof(GLuint) * numOfTriangles * 3, triangles, 0 );
 
-		glVertexArrayVertexBuffer( m_VAO, 0, m_VBO, 0, (3 + 2) * sizeof( GLfloat ) );
+		glVertexArrayVertexBuffer( m_VAO, 0, m_VBO, 0, (3 + 2 + 3) * sizeof( GLfloat ) );
 		glVertexArrayElementBuffer( m_VAO, m_EBO );
 
 		glEnableVertexArrayAttrib( m_VAO, 0 ); // Attrib 0 = Position
 		glVertexArrayAttribFormat( m_VAO, 0, 3, GL_FLOAT, GL_FALSE, 0 );
 
 		glEnableVertexArrayAttrib( m_VAO, 1 ); // Attrib 1 = UV
-		glVertexArrayAttribFormat( m_VAO, 1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat) );
+		glVertexArrayAttribFormat( m_VAO, 1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ) );
+
+		glEnableVertexArrayAttrib( m_VAO, 2 ); // Attrib 2 = Normal
+		glVertexArrayAttribFormat( m_VAO, 2, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ) );
 
 		glVertexArrayAttribBinding( m_VAO, 0, 0 );
 		glVertexArrayAttribBinding( m_VAO, 1, 0 );
+		glVertexArrayAttribBinding( m_VAO, 2, 0 );
 
 		m_numOfTriangles = numOfTriangles;
 	}
@@ -64,13 +73,21 @@ namespace glfr
 			0.0f, 1.0f
 		};
 
+		GLfloat normals[] =
+		{
+			0.0f, 0.0f, 1.0f,
+			0.0f, 0.0f, 1.0f,
+			0.0f, 0.0f, 1.0f,
+			0.0f, 0.0f, 1.0f
+		};
+
 		GLuint triangles[] = 
 		{
 			0, 1, 3,
 			1, 2, 3
 		};
 
-		return Mesh( 4, vertices, UVs, 2, triangles );
+		return Mesh( 4, vertices, UVs, normals, 2, triangles );
 
 	}
 
@@ -154,6 +171,44 @@ namespace glfr
 			0.0f, 1.0f
 		};
 
+		GLfloat normals[] = {
+			// Front face (0, 0, 1)
+			0.0f,  0.0f,  1.0f,
+			0.0f,  0.0f,  1.0f,
+			0.0f,  0.0f,  1.0f,
+			0.0f,  0.0f,  1.0f,
+
+			// Back face (0, 0, -1)
+			0.0f,  0.0f, -1.0f,
+			0.0f,  0.0f, -1.0f,
+			0.0f,  0.0f, -1.0f,
+			0.0f,  0.0f, -1.0f,
+
+			// Left face (-1, 0, 0)
+			-1.0f,  0.0f,  0.0f,
+			-1.0f,  0.0f,  0.0f,
+			-1.0f,  0.0f,  0.0f,
+			-1.0f,  0.0f,  0.0f,
+
+			// Right face (1, 0, 0)
+			1.0f,  0.0f,  0.0f,
+			1.0f,  0.0f,  0.0f,
+			1.0f,  0.0f,  0.0f,
+			1.0f,  0.0f,  0.0f,
+
+			// Top face (0, 1, 0)
+			0.0f,  1.0f,  0.0f,
+			0.0f,  1.0f,  0.0f,
+			0.0f,  1.0f,  0.0f,
+			0.0f,  1.0f,  0.0f,
+
+			// Bottom face (0, -1, 0)
+			0.0f, -1.0f,  0.0f,
+			0.0f, -1.0f,  0.0f,
+			0.0f, -1.0f,  0.0f,
+			0.0f, -1.0f,  0.0f
+		};
+
 		GLuint triangles[] = 
 		{
 			// Front face
@@ -180,7 +235,7 @@ namespace glfr
 			20,21,22,
 			22,23,20
 		};
-		return Mesh( 24, vertices, UVs, 12, triangles );
+		return Mesh( 24, vertices, UVs, normals, 12, triangles );
 
 	}
 

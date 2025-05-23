@@ -9,7 +9,7 @@ namespace glfr
 	class Color
 	{
 	public:
-		Color() : m_value{ 1., 1., 1., 1.f } {}
+		Color() : m_value{ 0., 0., 0., 1.f } {}
 
 		static Color FromRGBA( const int r, const int g, const int b, const int a );
 		static Color FromRGB( const int r, const int g, const int b );

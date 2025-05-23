@@ -9,12 +9,14 @@
 #include "mesh.hh"
 #include "shader.hh"
 #include "material.hh"
+#include "light.hh"
 
 namespace glfr
 {
 	class Renderer
 	{
 	public:
+		static const int kMaxNumOfLights = 10;
 		void Init( const int viewportWidth, const int viewportHeight );
 
 		void ClearColor( const int r, const int g, const int b );
@@ -28,6 +30,9 @@ namespace glfr
 		void SetCameraFOV( const float fov );
 		void SetCameraClipDistance( const float near, const float far );
 
+		void AddLight( Light light );
+		void ClearLights();
+
 		void DrawMesh( const Mesh &mesh, const glm::mat4 &transform );
 
 	private:
@@ -39,6 +44,8 @@ namespace glfr
 		} m_camera;
 
 		glm::mat4 m_viewMatrix, m_projectionMatrix;
+		int m_numOfLights = 0;
+		Light m_lights[kMaxNumOfLights];
 
 		void CalculateViewMatrix();
 		void CalculateProjectionMatrix();

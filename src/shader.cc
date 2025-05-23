@@ -21,6 +21,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
+#include "default_shaders.hh"
+
 namespace
 {
 	const char* ReadFileContent( const char *filePath )
@@ -207,35 +209,7 @@ namespace glfr
 	{
 		static Shader defaultShader
 		{
-			std::move( FromSources( 
-						"#version 330 core\n"
-						"layout ( location = 0 ) in vec3 vertexPos;\n"
-						"layout ( location = 1 ) in vec2 uv;"
-						"uniform mat4 mvpMatrix;"
-						"out vec2 uvCoords;"
-						"void main()\n"
-						"{\n"
-						"	uvCoords = uv;"
-						"	gl_Position = mvpMatrix * vec4(vertexPos, 1.0);\n"
-						"}\0"
-
-						, //###
-
-						"#version 330 core\n"
-						"struct Material\n"
-						"{\n"
-						"	vec3 diffuseColor;\n"
-						"};\n"
-						"in vec2 uvCoords;"
-						"uniform Material material;"
-						"out vec4 fragColor;\n"
-						"void main()\n"
-						"{\n"
-						"	fragColor = vec4(material.diffuseColor, 1.0f);\n"
-						"	//fragColor = vec4(uvCoords, 0.0, 1.0);\n"
-						"}\n\0"
-						) 
-						)
+			std::move( FromSources( pDefaultVertexShaderSource, pDefaultFragmentShaderSource ) )
 		};
 
 		return defaultShader;

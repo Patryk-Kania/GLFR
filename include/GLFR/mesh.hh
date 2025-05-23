@@ -12,7 +12,7 @@ namespace glfr
 	public:
 		Material material;
 
-		Mesh( const int numOfVertices, const GLfloat *vertices, const GLfloat *UVs,
+		Mesh( const int numOfVertices, const GLfloat *vertices, const GLfloat *UVs, const GLfloat *normals,
 		     const int numOfTriangles, const GLuint *triangles );
 		~Mesh();
 

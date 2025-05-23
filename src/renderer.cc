@@ -1,5 +1,7 @@
 #include "GLFR/renderer.hh"
 
+#include <string>
+
 #include <GL/glew.h>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
@@ -80,15 +82,122 @@ namespace glfr
 		m_camera.farClipPlane = far;
 		CalculateProjectionMatrix();
 	}
+
+	void Renderer::AddLight( Light light )
+	{
+		if( m_numOfLights < kMaxNumOfLights )
+		{
+			m_lights[m_numOfLights++] = light;
+		}
+	}
+
+	void Renderer::ClearLights()
+	{
+		m_numOfLights = 0;
+	}
 	
 	void Renderer::DrawMesh( const Mesh &mesh, const glm::mat4 &transform )
 	{
 		mesh.material.shader.Use();
 
 		glm::mat4 mvpMatrix = m_projectionMatrix * m_viewMatrix * transform;
+		glm::mat3 normalMatrix = glm::mat3{ glm::transpose( glm::inverse( transform ) ) };
 
 		mesh.material.shader.SetUniformValue( "mvpMatrix", mvpMatrix );
-		mesh.material.shader.SetUniformValue( "material.diffuseColor", mesh.material.diffuseColor.ToVec3() );
+		mesh.material.shader.SetUniformValue( "modelMatrix", transform );
+		mesh.material.shader.SetUniformValue( "normalMatrix", normalMatrix );
+		mesh.material.shader.SetUniformValue( "cameraPos", m_camera.position );
+
+		mesh.material.shader.SetUniformValue( "globalAmbient", glm::vec3{ .2f } );
+
+		mesh.material.shader.SetUniformValue( "material.isAffectedByLight",
+						      mesh.material.isAffectedByLight );
+
+		mesh.material.shader.SetUniformValue( "material.ambientColor",
+						      mesh.material.ambientColor.ToVec3() );
+		mesh.material.shader.SetUniformValue( "material.diffuseColor",
+						      mesh.material.diffuseColor.ToVec3() );
+		mesh.material.shader.SetUniformValue( "material.specularColor",
+						      mesh.material.specularColor.ToVec3() );
+		mesh.material.shader.SetUniformValue( "material.emissiveColor",
+						      mesh.material.emissiveColor.ToVec3() );
+		mesh.material.shader.SetUniformValue( "material.opacity",
+						      mesh.material.opacity );
+		mesh.material.shader.SetUniformValue( "material.specularPower",
+						      mesh.material.specularPower );
+		mesh.material.shader.SetUniformValue( "material.alphaThreshold",
+						      mesh.material.alphaThreshold );
+
+		bool hasAmbientTexture = mesh.material.ambientTexture.IsValid();
+		mesh.material.shader.SetUniformValue( "material.hasAmbientTexture", hasAmbientTexture );
+		if( hasAmbientTexture )
+		{
+			mesh.material.shader.SetUniformValue( "material.ambientTexture", 0 );
+			mesh.material.ambientTexture.Bind( GL_TEXTURE0 );
+		}
+
+		bool hasDiffuseTexture = mesh.material.diffuseTexture.IsValid();
+		mesh.material.shader.SetUniformValue( "material.hasDiffuseTexture", hasDiffuseTexture );
+		if( hasDiffuseTexture )
+		{
+			mesh.material.shader.SetUniformValue( "material.diffuseTexture", 1 );
+			mesh.material.ambientTexture.Bind( GL_TEXTURE1 );
+		}
+
+		bool hasSpecularTexture = mesh.material.specularTexture.IsValid();
+		mesh.material.shader.SetUniformValue( "material.hasSpecularTexture", hasSpecularTexture );
+		if( hasSpecularTexture )
+		{
+			mesh.material.shader.SetUniformValue( "material.specularTexture", 2 );
+			mesh.material.specularTexture.Bind( GL_TEXTURE2 );
+		}
+
+		bool hasEmissiveTexture = mesh.material.emissiveTexture.IsValid();
+		mesh.material.shader.SetUniformValue( "material.hasEmissiveTexture", hasEmissiveTexture );
+		if( hasEmissiveTexture )
+		{
+			mesh.material.shader.SetUniformValue( "material.emissiveTexture", 3 );
+			mesh.material.specularTexture.Bind( GL_TEXTURE3 );
+		}
+
+		bool hasSpecularPowerTexture = mesh.material.specularPowerTexture.IsValid();
+		mesh.material.shader.SetUniformValue( "material.hasSpecularPowerTexture", hasSpecularPowerTexture );
+		if( hasSpecularPowerTexture )
+		{
+			mesh.material.shader.SetUniformValue( "material.specularPowerTexture", 4 );
+			mesh.material.specularTexture.Bind( GL_TEXTURE4 );
+		}
+
+		bool hasOpacityTexture = mesh.material.opacityTexture.IsValid();
+		mesh.material.shader.SetUniformValue( "material.hasOpacityTexture", hasOpacityTexture );
+		if( hasOpacityTexture )
+		{
+			mesh.material.shader.SetUniformValue( "material.opacityTexture", 5 );
+			mesh.material.opacityTexture.Bind( GL_TEXTURE5 );
+		}
+
+		bool hasNormalTexture = mesh.material.normalTexture.IsValid();
+		mesh.material.shader.SetUniformValue( "material.hasNormalTexture", hasNormalTexture );
+		if( hasOpacityTexture )
+		{
+			mesh.material.shader.SetUniformValue( "material.normalTexture", 6 );
+			mesh.material.opacityTexture.Bind( GL_TEXTURE6 );
+		}
+
+		mesh.material.shader.SetUniformValue( "numOfLights", m_numOfLights );
+		for( int i = 0; i < m_numOfLights; i++)
+		{
+			std::string light = "lights[" + std::to_string( i ) + "].";
+
+			mesh.material.shader.SetUniformValue( (light + "type").c_str(), m_lights[i].type );
+			mesh.material.shader.SetUniformValue( (light + "color").c_str(), m_lights[i].color.ToVec3() );
+			mesh.material.shader.SetUniformValue( (light + "position").c_str(), m_lights[i].position );
+			mesh.material.shader.SetUniformValue( (light + "direction").c_str(), m_lights[i].direction );
+			mesh.material.shader.SetUniformValue( (light + "spotAngle").c_str(), m_lights[i].spotAngle );
+			mesh.material.shader.SetUniformValue( (light + "range").c_str(), m_lights[i].range );
+			mesh.material.shader.SetUniformValue( (light + "intensity").c_str(), m_lights[i].intensity );
+			mesh.material.shader.SetUniformValue( (light + "enabled").c_str(), m_lights[i].enabled );
+		}
 
 		glBindVertexArray( mesh.GetVAO() );
 		glDrawElements( GL_TRIANGLES, mesh.GetNumOfTriangles() * 3, GL_UNSIGNED_INT, nullptr );

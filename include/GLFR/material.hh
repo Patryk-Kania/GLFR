@@ -11,12 +11,14 @@ namespace glfr
 	{
 		Shader shader{ Shader::Default() };
 
-		Color ambientColor;
-		Color diffuseColor;
-		Color specularColor;
+		bool isAffectedByLight = true;
+
+		Color ambientColor = Color::White();
+		Color diffuseColor = Color::White();
+		Color specularColor = Color::White();
 		Color emissiveColor;
-		float opacity;
-		float specularPower;
+		float opacity = 1.0f;
+		float specularPower = 32.0f;
 		float alphaThreshold;
 
 		Texture2D ambientTexture;
