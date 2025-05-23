@@ -2,6 +2,8 @@
 
 #include <cstdio>
 
+#include <utility>
+
 #include <GL/glew.h>
 #include <glm/mat4x4.hpp>
 #include <glm/mat4x3.hpp>
@@ -78,13 +80,78 @@ namespace
 
 namespace glfr
 {
-	bool Shader::LoadFromSources( const char *vertexShaderSource, const char *fragmentShaderSource )
+	Shader::Shader( const Shader &other )
+		: m_handle{ other.m_handle }, m_refCount{ other.m_refCount }
 	{
+		if( m_refCount )
+			(*m_refCount)++;
+	}
+
+	Shader::Shader( Shader &&other ) noexcept
+		: m_handle{ other.m_handle }, m_refCount{ other.m_refCount }
+	{
+		other.m_handle = 0;
+		other.m_refCount = nullptr;
+	}
+
+	Shader& Shader::operator=( const Shader &other )
+	{
+		if( this != &other )
+		{
+			ReleaseHandle();
+
+			m_handle = other.m_handle;
+			m_refCount = other.m_refCount;
+
+			if( m_refCount )
+				(*m_refCount)++;
+		}
+
+		return *this;
+	}
+
+	Shader& Shader::operator=( Shader &&other ) noexcept
+	{
+		if( this != &other )
+		{
+			ReleaseHandle();
+
+			m_handle = other.m_handle;
+			m_refCount = other.m_refCount;
+
+			other.m_handle = 0;
+			other.m_refCount = nullptr;
+		}
+		
+		return *this;
+	}
+
+	Shader::~Shader()
+	{
+		ReleaseHandle();
+	}
+
+	void Shader::ReleaseHandle()
+	{
+		if( m_refCount && --(*m_refCount) == 0 )
+		{
+			glDeleteProgram( m_handle );
+			delete m_refCount;
+		}
+
+		m_refCount = nullptr;
+		m_handle = 0;
+	}
+
+	Shader Shader::FromSources( const char *vertexShaderSource, const char *fragmentShaderSource )
+	{
+		Shader shader;
+
 		GLuint vertexShader = CreateShaderFromSource( GL_VERTEX_SHADER, vertexShaderSource );
 		if( !vertexShader )
 		{
 			fputs( "Failed to create vertex Shader\n", stderr );
-			return false;
+			return shader;
 		}
 
 		GLuint fragmentShader = CreateShaderFromSource( GL_FRAGMENT_SHADER, fragmentShaderSource );
@@ -92,146 +159,271 @@ namespace glfr
 		{
 			glDeleteShader( vertexShader );
 			fputs( "Failed to create fragment Shader\n", stderr );
-			return false;
+			return shader;
 		}
 
-		m_shaderProgram = glCreateProgram( );
-		glAttachShader( m_shaderProgram, vertexShader );
-		glAttachShader( m_shaderProgram, fragmentShader );
-		glLinkProgram( m_shaderProgram );
+		shader.m_handle = glCreateProgram( );
+		glAttachShader( shader.m_handle, vertexShader );
+		glAttachShader( shader.m_handle, fragmentShader );
+		glLinkProgram( shader.m_handle );
 
 		int success;
-		glGetProgramiv( m_shaderProgram, GL_LINK_STATUS, &success );
+		glGetProgramiv( shader.m_handle, GL_LINK_STATUS, &success );
 		if( !success )
 		{
 			char infoLog[512];
-			glGetProgramInfoLog( m_shaderProgram, 512, nullptr, infoLog );
+			glGetProgramInfoLog( shader.m_handle, 512, nullptr, infoLog );
 
 			glDeleteShader( vertexShader );
 			glDeleteShader( fragmentShader );
-			glDeleteProgram( m_shaderProgram );
+			glDeleteProgram( shader.m_handle );
 			fprintf( stderr, "Program Linking Error: \n%s\n", infoLog );
-			return false;
+			return shader;
 		}
 
 		glDeleteShader( vertexShader );
 		glDeleteShader( fragmentShader );
-		return true;
+
+		shader.m_refCount = new int{ 1 };
+
+		return shader;
 
 	}
 
-	bool Shader::LoadFromFiles( const char *vertexShaderPath, const char *fragmentShaderPath )
+	Shader Shader::FromFiles( const char *vertexShaderPath, const char *fragmentShaderPath )
 	{
 		const char *pVertexShaderSource = ReadFileContent( vertexShaderPath );
 		const char *pFragmentShaderSource = ReadFileContent( fragmentShaderPath );
 
-		bool success = LoadFromSources( pVertexShaderSource, pFragmentShaderSource );
+		Shader shader = std::move( FromSources( pVertexShaderSource, pFragmentShaderSource ) );
 
 		delete[] pVertexShaderSource;
 		delete[] pFragmentShaderSource;
 
-		return success;
+		return shader;
 	}
 
-	void Shader::Use( )
+	Shader Shader::Default()
 	{
-		glUseProgram( m_shaderProgram );
+		static Shader defaultShader
+		{
+			std::move( FromSources( 
+						"#version 330 core\n"
+						"layout ( location = 0 ) in vec3 vertexPos;\n"
+						"layout ( location = 1 ) in vec2 uv;"
+						"uniform mat4 mvpMatrix;"
+						"out vec2 uvCoords;"
+						"void main()\n"
+						"{\n"
+						"	uvCoords = uv;"
+						"	gl_Position = mvpMatrix * vec4(vertexPos, 1.0);\n"
+						"}\0"
+
+						, //###
+
+						"#version 330 core\n"
+						"struct Material\n"
+						"{\n"
+						"	vec3 diffuseColor;\n"
+						"};\n"
+						"in vec2 uvCoords;"
+						"uniform Material material;"
+						"out vec4 fragColor;\n"
+						"void main()\n"
+						"{\n"
+						"	fragColor = vec4(material.diffuseColor, 1.0f);\n"
+						"	//fragColor = vec4(uvCoords, 0.0, 1.0);\n"
+						"}\n\0"
+						) 
+						)
+		};
+
+		return defaultShader;
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::mat4 &value ) 
+	void Shader::Use() const
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		glUseProgram( m_handle );
+	}
+
+	void Shader::SetUniformValue( const char *name, const glm::mat4 &value ) const 
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &value[0][0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::mat4x3 &value )
+	void Shader::SetUniformValue( const char *name, const glm::mat4x3 &value ) const
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniformMatrix4x3fv( uniformLocation, 1, GL_FALSE, &value[0][0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::mat4x2 &value ) 
+	void Shader::SetUniformValue( const char *name, const glm::mat4x2 &value ) const 
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniformMatrix4x2fv( uniformLocation, 1, GL_FALSE, &value[0][0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::mat3 &value )
+	void Shader::SetUniformValue( const char *name, const glm::mat3 &value ) const
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniformMatrix3fv( uniformLocation, 1, GL_FALSE, &value[0][0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::mat3x4 &value ) 
+	void Shader::SetUniformValue( const char *name, const glm::mat3x4 &value ) const 
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniformMatrix3x4fv( uniformLocation, 1, GL_FALSE, &value[0][0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::mat3x2 &value ) 
+	void Shader::SetUniformValue( const char *name, const glm::mat3x2 &value ) const 
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniformMatrix3x2fv( uniformLocation, 1, GL_FALSE, &value[0][0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::mat2 &value )
+	void Shader::SetUniformValue( const char *name, const glm::mat2 &value ) const
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniformMatrix2fv( uniformLocation, 1, GL_FALSE, &value[0][0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::mat2x4 &value ) 
+	void Shader::SetUniformValue( const char *name, const glm::mat2x4 &value ) const 
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniformMatrix2x4fv( uniformLocation, 1, GL_FALSE, &value[0][0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::mat2x3 &value ) 
+	void Shader::SetUniformValue( const char *name, const glm::mat2x3 &value ) const 
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniformMatrix2x3fv( uniformLocation, 1, GL_FALSE, &value[0][0] );
 	}
 
 
-	void Shader::SetUniformValue( const char *name, const glm::vec4 &value )
+	void Shader::SetUniformValue( const char *name, const glm::vec4 &value ) const
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniform4fv( uniformLocation, 1, &value[0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::vec3 &value ) 
+	void Shader::SetUniformValue( const char *name, const glm::vec3 &value ) const 
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniform3fv( uniformLocation, 1, &value[0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const glm::vec2 &value ) 
+	void Shader::SetUniformValue( const char *name, const glm::vec2 &value ) const 
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniform2fv( uniformLocation, 1, &value[0] );
 	}
 
-	void Shader::SetUniformValue( const char *name, const float x, const float y, const float z, const float w ) 
+	void Shader::SetUniformValue( const char *name, const float x, const float y, const float z, const float w ) const 
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniform4f( uniformLocation, x, y, z, w );
 	}
 
-	void Shader::SetUniformValue( const char *name, const float x, const float y, const float z )
+	void Shader::SetUniformValue( const char *name, const float x, const float y, const float z ) const
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniform3f( uniformLocation, x, y, z );
 	}
 
-	void Shader::SetUniformValue( const char *name, const float x, const float y )
+	void Shader::SetUniformValue( const char *name, const float x, const float y ) const
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniform2f( uniformLocation, x, y );
 	}
 
-	void Shader::SetUniformValue( const char *name, const float x )
+	void Shader::SetUniformValue( const char *name, const float x ) const
 	{
-		GLint uniformLocation = glGetUniformLocation( m_shaderProgram, name );
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
 		glUniform1f( uniformLocation, x );
+	}
+
+	void Shader::SetUniformValue( const char *name, const glm::ivec4 &value ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform4iv( uniformLocation, 1, &value[0] );
+	}
+
+	void Shader::SetUniformValue( const char *name, const glm::ivec3 &value ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform3iv( uniformLocation, 1, &value[0] );
+	}
+
+	void Shader::SetUniformValue( const char *name, const glm::ivec2 &value ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform2iv( uniformLocation, 1, &value[0] );
+	}
+
+	void Shader::SetUniformValue( const char *name, const int x, const int y, const int z, const int w ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform4i( uniformLocation, x, y, z, w );
+	}
+
+	void Shader::SetUniformValue( const char *name, const int x, const int y, const int z ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform3i( uniformLocation, x, y, z );
+	}
+
+	void Shader::SetUniformValue( const char *name, const int x, const int y ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform2i( uniformLocation, x, y );
+	}
+
+	void Shader::SetUniformValue( const char *name, const int x ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform1i( uniformLocation, x );
+	}
+
+	void Shader::SetUniformValue( const char *name, const glm::uvec4 &value ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform4uiv( uniformLocation, 1, &value[0] );
+	}
+
+	void Shader::SetUniformValue( const char *name, const glm::uvec3 &value ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform3uiv( uniformLocation, 1, &value[0] );
+	}
+
+	void Shader::SetUniformValue( const char *name, const glm::uvec2 &value ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform2uiv( uniformLocation, 1, &value[0] );
+	}
+
+	void Shader::SetUniformValue( const char *name, const unsigned int x, const unsigned int y, const unsigned int z, const unsigned int w ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform4ui( uniformLocation, x, y, z, w );
+	}
+
+	void Shader::SetUniformValue( const char *name, const unsigned int x, const unsigned int y, const unsigned int z ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform3ui( uniformLocation, x, y, z );
+	}
+
+	void Shader::SetUniformValue( const char *name, const unsigned int x, const unsigned int y ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform2ui( uniformLocation, x, y );
+	}
+
+	void Shader::SetUniformValue( const char *name, const unsigned int x ) const
+	{
+		GLint uniformLocation = glGetUniformLocation( m_handle, name );
+		glUniform1ui( uniformLocation, x );
 	}
 }

@@ -3,11 +3,14 @@
 
 #include "texture2d.hh"
 #include "color.hh"
+#include "shader.hh"
 
 namespace glfr
 {
 	struct Material
 	{
+		Shader shader{ Shader::Default() };
+
 		Color ambientColor;
 		Color diffuseColor;
 		Color specularColor;

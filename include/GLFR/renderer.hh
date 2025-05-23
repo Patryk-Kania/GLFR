@@ -38,8 +38,6 @@ namespace glfr
 			float nearClipPlane, farClipPlane;
 		} m_camera;
 
-		Shader m_defaultShader;
-
 		glm::mat4 m_viewMatrix, m_projectionMatrix;
 
 		void CalculateViewMatrix();

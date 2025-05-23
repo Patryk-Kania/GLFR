@@ -10,33 +10,6 @@
 #include "GLFR/shader.hh"
 #include "GLFR/material.hh"
 
-const char *vertexShaderSource = 
-"#version 330 core\n"
-"layout ( location = 0 ) in vec3 vertexPos;\n"
-"layout ( location = 1 ) in vec2 uv;"
-"uniform mat4 mvpMatrix;"
-"out vec2 uvCoords;"
-"void main()\n"
-"{\n"
-"	uvCoords = uv;"
-"	gl_Position = mvpMatrix * vec4(vertexPos, 1.0);\n"
-"}\0";
-
-const char *fragmentShaderSource = 
-"#version 330 core\n"
-"struct Material\n"
-"{\n"
-"	vec3 diffuseColor;\n"
-"};\n"
-"in vec2 uvCoords;"
-"uniform Material material;"
-"out vec4 fragColor;\n"
-"void main()\n"
-"{\n"
-"	fragColor = vec4(material.diffuseColor, 1.0f);\n"
-"	//fragColor = vec4(uvCoords, 0.0, 1.0);\n"
-"}\n\0";
-
 namespace glfr
 {
 	void Renderer::Init( const int viewportWidth, const int viewportHeight )
@@ -53,8 +26,6 @@ namespace glfr
 
 		CalculateViewMatrix();
 		CalculateProjectionMatrix();
-
-		m_defaultShader.LoadFromSources( vertexShaderSource, fragmentShaderSource );
 	}
 
 	void Renderer::ClearColor( const int r, const int g, const int b )
@@ -112,12 +83,12 @@ namespace glfr
 	
 	void Renderer::DrawMesh( const Mesh &mesh, const glm::mat4 &transform )
 	{
-		m_defaultShader.Use();
+		mesh.material.shader.Use();
 
 		glm::mat4 mvpMatrix = m_projectionMatrix * m_viewMatrix * transform;
 
-		m_defaultShader.SetUniformValue( "mvpMatrix", mvpMatrix );
-		m_defaultShader.SetUniformValue( "material.diffuseColor", mesh.material.diffuseColor.ToVec3() );
+		mesh.material.shader.SetUniformValue( "mvpMatrix", mvpMatrix );
+		mesh.material.shader.SetUniformValue( "material.diffuseColor", mesh.material.diffuseColor.ToVec3() );
 
 		glBindVertexArray( mesh.GetVAO() );
 		glDrawElements( GL_TRIANGLES, mesh.GetNumOfTriangles() * 3, GL_UNSIGNED_INT, nullptr );
