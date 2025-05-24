@@ -31,6 +31,8 @@ int main()
 
 	glfr::Renderer renderer;
 	renderer.Init( g_kWindowWidth, g_kWindowHeight );
+	renderer.SetCameraPosition( glm::vec3{ 0.0f, 2.0f, 0.0f } );
+	renderer.SetCameraRotation( glm::vec3{ -45.0f, 0.0f, 0.0f } );
 
 	glfr::Light sunLight;
 	sunLight.type = glfr::Light::DIRECTIONAL_LIGHT;
@@ -45,10 +47,9 @@ int main()
 
 	glfr::Light l2;
 	l2.type = glfr::Light::SPOT_LIGHT;
-	l2.position = glm::vec3{ 2.0f, -0.9f, -4.0f };
-	l2.direction = glm::vec3{ -1.0f, 0.0f, 0.0f };
+	l2.position = glm::vec3{ 2.0f, 0.0f, -4.0f };
+	l2.direction = glm::vec3{ -1.0f, -1.0f, 0.0f };
 	l2.color = glfr::Color::White();
-	l2.intensity = 0.8f;
 	l2.spotAngle = 30.0f;
 	l2.range = 4.0f;
 
@@ -56,24 +57,25 @@ int main()
 	renderer.AddLight( l1 );
 	renderer.AddLight( l2 );
 
-	glfr::Mesh mesh = glfr::Mesh::NewCube();
+	glfr::Mesh cube = glfr::Mesh::NewCube();
 	glfr::Mesh floor = glfr::Mesh::NewQuad();
-	glfr::Mesh lightSource = glfr::Mesh::NewCube();
 
-	glfr::Texture2D meshColor = glfr::Texture2D::FromFile( "container_color.png" );
-	mesh.material.ambientTexture = meshColor;
-	mesh.material.diffuseTexture = meshColor;
-	mesh.material.specularTexture = glfr::Texture2D::FromFile( "container_specular.png" );
+	glfr::Material cubeMaterial;
+	glfr::Texture2D cubeColor = glfr::Texture2D::FromFile( "container_color.png" );
+	cubeMaterial.ambientTexture = cubeColor;
+	cubeMaterial.diffuseTexture = cubeColor;
+	cubeMaterial.specularTexture = glfr::Texture2D::FromFile( "container_specular.png" );
 
+	glfr::Material floorMaterial;
 	glfr::Texture2D floorColor = glfr::Texture2D::FromFile( "floor_diffuse.png" );
-	floor.material.ambientTexture = floorColor; 
-	floor.material.diffuseTexture = floorColor;
-	floor.material.specularTexture = floorColor;
-	floor.material.normalTexture = glfr::Texture2D::FromFile( "floor_normal.png" );
-	floor.material.specularPower = 8;
+	floorMaterial.ambientTexture = floorColor; 
+	floorMaterial.diffuseTexture = floorColor;
+	floorMaterial.specularTexture = floorColor;
+	floorMaterial.specularPower = 8;
 
-	lightSource.material.isAffectedByLight = false;
-	lightSource.material.diffuseColor = glfr::Color::Magenta();
+	glfr::Material lightSourceMaterial;
+	lightSourceMaterial.isAffectedByLight = false;
+	lightSourceMaterial.diffuseColor = glfr::Color::Magenta();
 	
 	float lastTime = 0.0f;
 	float deltaTime = 0.0f;
@@ -93,17 +95,17 @@ int main()
 
 		rotationY += glm::radians( 45.f ) * deltaTime;
 
-		glm::mat4 meshTransform = glm::mat4 { 1.0f };
-		meshTransform = glm::translate( meshTransform, glm::vec3 { 0.0f, -0.5f, -4.0f } );
-		meshTransform = glm::rotate( meshTransform, rotationY, glm::vec3 { 0.f, 1.f, 0.f } );
+		glm::mat4 cubeTransform = glm::mat4 { 1.0f };
+		cubeTransform = glm::translate( cubeTransform, glm::vec3 { 0.0f, -0.5f, -4.0f } );
+		cubeTransform = glm::rotate( cubeTransform, rotationY, glm::vec3 { 0.f, 1.f, 0.f } );
 
 		glm::mat4 lightSourceTransform = glm::mat4{ 1.0f };
 		lightSourceTransform = glm::translate( lightSourceTransform, glm::vec3{ -2.0f, -0.5f, -4.0f } );
 		lightSourceTransform = glm::scale( lightSourceTransform, glm::vec3{ 0.2f, 0.2f, 0.2f } );
 
 
-		renderer.DrawMesh( mesh, meshTransform );
-		renderer.DrawMesh( lightSource, lightSourceTransform );
+		renderer.DrawMesh( cube, cubeMaterial, cubeTransform );
+		renderer.DrawMesh( cube, lightSourceMaterial, lightSourceTransform );
 
 		for( int x = -5; x < 5; x++)
 		{
@@ -113,7 +115,7 @@ int main()
 				floorTransform = glm::translate( floorTransform, glm::vec3{ x, -1.0f, y } );
 				floorTransform = glm::rotate( floorTransform, glm::radians(-90.0f), glm::vec3{ 1.0f, 0.0f, 0.0f } );
 
-				renderer.DrawMesh( floor, floorTransform );
+				renderer.DrawMesh( floor, floorMaterial, floorTransform );
 			}
 		}
 

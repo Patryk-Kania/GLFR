@@ -33,7 +33,7 @@ namespace glfr
 		void AddLight( Light light );
 		void ClearLights();
 
-		void DrawMesh( const Mesh &mesh, const glm::mat4 &transform );
+		void DrawMesh( const Mesh &mesh, const Material &material, const glm::mat4 &transform );
 
 	private:
 		struct

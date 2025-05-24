@@ -14,9 +14,9 @@ namespace glfr
 		
 		Color color = Color::White();
 		glm::vec3 position;
-		glm::vec3 direction;
-		float spotAngle = 90;
-		float range = 10.0f;
+		glm::vec3 direction = glm::vec3{ 0.0f, -1.0f, 0.0f };
+		float spotAngle = 60;
+		float range = 6.0f;
 		float intensity = 1.0f;
 		bool enabled = true;
 	};

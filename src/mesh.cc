@@ -2,6 +2,8 @@
 
 #include <GL/glew.h>
 
+#include "default_meshes.hh"
+
 namespace glfr
 {
 	Mesh::Mesh( const int numOfVertices, const GLfloat *vertices, const GLfloat *UVs, const GLfloat *normals,
@@ -52,198 +54,84 @@ namespace glfr
 		glVertexArrayAttribBinding( m_VAO, 2, 0 );
 
 		m_numOfTriangles = numOfTriangles;
+
+		m_refCount = new int{ 1 };
 	}
 
-	Mesh Mesh::NewQuad()
+	Mesh::Mesh( const Mesh &other ) : m_VAO{ other.m_VAO }, m_VBO{ other.m_VBO }, m_EBO{ other.m_EBO },
+		m_numOfTriangles{ other.m_numOfTriangles }, m_refCount{ other.m_refCount }
 	{
-
-		GLfloat vertices[] = 
-		{
-			 0.5f,  0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			-0.5f, -0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f
-		};
-
-		GLfloat UVs[] =
-		{
-			1.0f, 1.0f,
-			1.0f, 0.0f,
-			0.0f, 0.0f,
-			0.0f, 1.0f
-		};
-
-		GLfloat normals[] =
-		{
-			0.0f, 0.0f, 1.0f,
-			0.0f, 0.0f, 1.0f,
-			0.0f, 0.0f, 1.0f,
-			0.0f, 0.0f, 1.0f
-		};
-
-		GLuint triangles[] = 
-		{
-			0, 1, 3,
-			1, 2, 3
-		};
-
-		return Mesh( 4, vertices, UVs, normals, 2, triangles );
-
+		if( m_refCount )
+			(*m_refCount)++;
 	}
 
-	Mesh Mesh::NewCube()
+	Mesh::Mesh( Mesh &&other ) noexcept : m_VAO{ other.m_VAO }, m_VBO{ other.m_VBO }, m_EBO{ other.m_EBO },
+		m_numOfTriangles{ other.m_numOfTriangles }, m_refCount{ other.m_refCount }
 	{
-		GLfloat vertices[] = 
+		other.m_VAO = 0;
+		other.m_VBO = 0;
+		other.m_EBO = 0;
+		other.m_numOfTriangles = 0;
+		other.m_refCount = nullptr;
+	}
+
+	Mesh& Mesh::operator=( const Mesh &other )
+	{
+		if( this != &other )
 		{
-			// Front face
-			-0.5f, -0.5f,  0.5f, // 0
-			0.5f, -0.5f,  0.5f, // 1
-			0.5f,  0.5f,  0.5f, // 2
-			-0.5f,  0.5f,  0.5f, // 3
+			ReleaseHandles();
 
-			// Back face
-			0.5f, -0.5f, -0.5f, // 4
-			-0.5f, -0.5f, -0.5f, // 5
-			-0.5f,  0.5f, -0.5f, // 6
-			0.5f,  0.5f, -0.5f, // 7
+			m_VAO = other.m_VAO;
+			m_VBO = other.m_VBO;
+			m_EBO = other.m_EBO;
+			m_numOfTriangles = other.m_numOfTriangles;
+			m_refCount = other.m_refCount;
 
-			// Left face
-			-0.5f, -0.5f, -0.5f, // 8
-			-0.5f, -0.5f,  0.5f, // 9
-			-0.5f,  0.5f,  0.5f, //10
-			-0.5f,  0.5f, -0.5f, //11
+			if( m_refCount )
+				(*m_refCount)++;
+		}
 
-			// Right face
-			0.5f, -0.5f,  0.5f, //12
-			0.5f, -0.5f, -0.5f, //13
-			0.5f,  0.5f, -0.5f, //14
-			0.5f,  0.5f,  0.5f, //15
+		return *this;
+	}
 
-			// Top face
-			-0.5f,  0.5f,  0.5f, //16
-			0.5f,  0.5f,  0.5f, //17
-			0.5f,  0.5f, -0.5f, //18
-			-0.5f,  0.5f, -0.5f, //19
+	Mesh& Mesh::operator=( Mesh &&other ) noexcept
+	{
 
-			// Bottom face
-			-0.5f, -0.5f, -0.5f, //20
-			0.5f, -0.5f, -0.5f, //21
-			0.5f, -0.5f,  0.5f, //22
-			-0.5f, -0.5f,  0.5f  //23
-		};
-
-		GLfloat UVs[] = 
+		if( this != &other )
 		{
-			// Front
-			0.0f, 0.0f,
-			1.0f, 0.0f,
-			1.0f, 1.0f,
-			0.0f, 1.0f,
+			ReleaseHandles();
 
-			// Back
-			0.0f, 0.0f,
-			1.0f, 0.0f,
-			1.0f, 1.0f,
-			0.0f, 1.0f,
+			m_VAO = other.m_VAO;
+			m_VBO = other.m_VBO;
+			m_EBO = other.m_EBO;
+			m_numOfTriangles = other.m_numOfTriangles;
+			m_refCount = other.m_refCount;
 
-			// Left
-			0.0f, 0.0f,
-			1.0f, 0.0f,
-			1.0f, 1.0f,
-			0.0f, 1.0f,
+			other.m_VAO = 0;
+			other.m_VBO = 0;
+			other.m_EBO = 0;
+			other.m_numOfTriangles = 0;
+			other.m_refCount = nullptr;
+		}
 
-			// Right
-			0.0f, 0.0f,
-			1.0f, 0.0f,
-			1.0f, 1.0f,
-			0.0f, 1.0f,
-
-			// Top
-			0.0f, 0.0f,
-			1.0f, 0.0f,
-			1.0f, 1.0f,
-			0.0f, 1.0f,
-
-			// Bottom
-			0.0f, 0.0f,
-			1.0f, 0.0f,
-			1.0f, 1.0f,
-			0.0f, 1.0f
-		};
-
-		GLfloat normals[] = {
-			// Front face (0, 0, 1)
-			0.0f,  0.0f,  1.0f,
-			0.0f,  0.0f,  1.0f,
-			0.0f,  0.0f,  1.0f,
-			0.0f,  0.0f,  1.0f,
-
-			// Back face (0, 0, -1)
-			0.0f,  0.0f, -1.0f,
-			0.0f,  0.0f, -1.0f,
-			0.0f,  0.0f, -1.0f,
-			0.0f,  0.0f, -1.0f,
-
-			// Left face (-1, 0, 0)
-			-1.0f,  0.0f,  0.0f,
-			-1.0f,  0.0f,  0.0f,
-			-1.0f,  0.0f,  0.0f,
-			-1.0f,  0.0f,  0.0f,
-
-			// Right face (1, 0, 0)
-			1.0f,  0.0f,  0.0f,
-			1.0f,  0.0f,  0.0f,
-			1.0f,  0.0f,  0.0f,
-			1.0f,  0.0f,  0.0f,
-
-			// Top face (0, 1, 0)
-			0.0f,  1.0f,  0.0f,
-			0.0f,  1.0f,  0.0f,
-			0.0f,  1.0f,  0.0f,
-			0.0f,  1.0f,  0.0f,
-
-			// Bottom face (0, -1, 0)
-			0.0f, -1.0f,  0.0f,
-			0.0f, -1.0f,  0.0f,
-			0.0f, -1.0f,  0.0f,
-			0.0f, -1.0f,  0.0f
-		};
-
-		GLuint triangles[] = 
-		{
-			// Front face
-			0, 1, 2,
-			2, 3, 0,
-
-			// Back face
-			4, 5, 6,
-			6, 7, 4,
-
-			// Left face
-			8, 9,10,
-			10,11, 8,
-
-			// Right face
-			12,13,14,
-			14,15,12,
-
-			// Top face
-			16,17,18,
-			18,19,16,
-
-			// Bottom face
-			20,21,22,
-			22,23,20
-		};
-		return Mesh( 24, vertices, UVs, normals, 12, triangles );
-
+		return *this;
 	}
 
 	Mesh::~Mesh()
 	{
-		glDeleteVertexArrays( 1, &m_VAO );
-		glDeleteBuffers( 1, &m_VBO );
-		glDeleteBuffers( 1, &m_EBO );
+		ReleaseHandles();
+	}
+
+	Mesh Mesh::NewQuad()
+	{
+		static Mesh defaultQuad{ 4, Quad::vertices, Quad::UVs, Quad::normals, 2, Quad::triangles };
+		return defaultQuad;
+	}
+
+	Mesh Mesh::NewCube()
+	{
+		static Mesh defaultCube{ 24, Cube::vertices, Cube::UVs, Cube::normals, 12, Cube::triangles };
+		return defaultCube;
 	}
 
 	GLuint Mesh::GetVAO() const
@@ -254,5 +142,21 @@ namespace glfr
 	int Mesh::GetNumOfTriangles() const
 	{
 		return m_numOfTriangles;
+	}
+
+	void Mesh::ReleaseHandles()
+	{
+		if( m_refCount && --(*m_refCount) == 0)
+		{
+			glDeleteVertexArrays( 1, &m_VAO );
+			glDeleteBuffers( 1, &m_VBO );
+			glDeleteBuffers( 1, &m_EBO );
+			delete m_refCount;
+		}
+
+		m_VAO = 0;
+		m_VBO = 0;
+		m_EBO = 0;
+		m_refCount = nullptr;
 	}
 }
