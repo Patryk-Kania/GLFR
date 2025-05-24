@@ -10,6 +10,7 @@
 - Support for multiple light sources
 - Simple shadow rendering
 - Single controllable camera
+- PBR 
 
 ## Development Environment
 
