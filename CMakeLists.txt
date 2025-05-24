@@ -20,5 +20,4 @@ add_library(glfr STATIC src/renderer.cc src/shader.cc src/mesh.cc src/texture2d.
 target_include_directories(glfr PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
 				PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/src")
 
-add_executable(test src/main.cc)
-target_link_libraries(test OpenGL::GL glfw GLEW::glew glm::glm glfr)
+add_subdirectory(examples)
