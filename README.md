@@ -41,10 +41,14 @@ I might’ve messed up versioning a bit, so I’m skipping v0.2.0.
 - Texture mapping - can create textures from pixel array
 ![image](https://github.com/user-attachments/assets/04d65cb2-1c13-4e74-b134-5bbe4e28657d)
 
+### GLFR v0.4.0
+- Significantly refactored the codebase
+- (Finally) understood what's going on with move semantics and RAII — or at least I hope so
+- The Material class now has a clear purpose
+- Decoupled material and mesh: it's now possible to render the same mesh with different materials
+- Added support for rendering multiple dynamic lights — up to 10 (goal achieved)
+- Implemented texture loading from files
+![image](https://github.com/user-attachments/assets/1b5aa000-5520-4984-b63e-5860f50c168c)
+
 ## Whats next:
-**Lights**
-- Default always active directional light
-- Control directional light properties
-- Create new lights: point and spot
-- Materials with properties to control how light affects the object
-- Support Multiple light sources
+**Shadows**!!!
