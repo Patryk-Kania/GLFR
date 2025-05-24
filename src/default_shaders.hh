@@ -161,26 +161,26 @@ void main()
 		vec3 ambient = material.ambientColor;
 		if( material.hasAmbientTexture )
 		{
-			vec3 ambient = vec3( texture( material.ambientTexture, fragUV ) );
+			ambient = vec3( texture( material.ambientTexture, fragUV ) );
 		}
 		ambient = ambient * globalAmbient;
 
 		vec3 diffuse = material.diffuseColor;
 		if( material.hasDiffuseTexture )
 		{
-			vec3 diffuse = vec3( texture( material.diffuseTexture, fragUV ) );
+			diffuse = vec3( texture( material.diffuseTexture, fragUV ) );
 		}
 
 		vec3 specular = material.specularColor;
 		if( material.hasSpecularTexture )
 		{
-			vec3 specular = vec3( texture( material.specularTexture, fragUV ) );
+			specular = vec3( texture( material.specularTexture, fragUV ) );
 		}
 
 		vec3 emissive = material.emissiveColor;
 		if( material.hasEmissiveTexture )
 		{
-			vec3 emissive = vec3( texture( material.emissiveTexture, fragUV ) );
+			emissive = vec3( texture( material.emissiveTexture, fragUV ) );
 		}
 
 		float shininess = material.specularPower;

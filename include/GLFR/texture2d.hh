@@ -19,7 +19,7 @@ namespace glfr
 
 		static Texture2D FromPixelsRGBA( const GLubyte *pixels, const int width, const int height );
 		static Texture2D FromColorRGBA( const GLubyte r, const GLubyte g, const GLubyte b, const GLubyte a );
-		//static Texture2D FromFile( const char *file, const int width, const int height, const GLenum format );
+		static Texture2D FromFile( const char *file, bool flipVertically = true );
 
 		void Bind( GLenum unit = GL_TEXTURE0 ) const;
 		bool IsValid() const;

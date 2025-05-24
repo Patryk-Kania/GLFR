@@ -133,7 +133,7 @@ namespace glfr
 		if( hasAmbientTexture )
 		{
 			mesh.material.shader.SetUniformValue( "material.ambientTexture", 0 );
-			mesh.material.ambientTexture.Bind( GL_TEXTURE0 );
+			mesh.material.ambientTexture.Bind( 0 );
 		}
 
 		bool hasDiffuseTexture = mesh.material.diffuseTexture.IsValid();
@@ -141,7 +141,7 @@ namespace glfr
 		if( hasDiffuseTexture )
 		{
 			mesh.material.shader.SetUniformValue( "material.diffuseTexture", 1 );
-			mesh.material.ambientTexture.Bind( GL_TEXTURE1 );
+			mesh.material.ambientTexture.Bind( 1 );
 		}
 
 		bool hasSpecularTexture = mesh.material.specularTexture.IsValid();
@@ -149,7 +149,7 @@ namespace glfr
 		if( hasSpecularTexture )
 		{
 			mesh.material.shader.SetUniformValue( "material.specularTexture", 2 );
-			mesh.material.specularTexture.Bind( GL_TEXTURE2 );
+			mesh.material.specularTexture.Bind( 2 );
 		}
 
 		bool hasEmissiveTexture = mesh.material.emissiveTexture.IsValid();
@@ -157,7 +157,7 @@ namespace glfr
 		if( hasEmissiveTexture )
 		{
 			mesh.material.shader.SetUniformValue( "material.emissiveTexture", 3 );
-			mesh.material.specularTexture.Bind( GL_TEXTURE3 );
+			mesh.material.specularTexture.Bind( 3 );
 		}
 
 		bool hasSpecularPowerTexture = mesh.material.specularPowerTexture.IsValid();
@@ -165,7 +165,7 @@ namespace glfr
 		if( hasSpecularPowerTexture )
 		{
 			mesh.material.shader.SetUniformValue( "material.specularPowerTexture", 4 );
-			mesh.material.specularTexture.Bind( GL_TEXTURE4 );
+			mesh.material.specularTexture.Bind( 4 );
 		}
 
 		bool hasOpacityTexture = mesh.material.opacityTexture.IsValid();
@@ -173,7 +173,7 @@ namespace glfr
 		if( hasOpacityTexture )
 		{
 			mesh.material.shader.SetUniformValue( "material.opacityTexture", 5 );
-			mesh.material.opacityTexture.Bind( GL_TEXTURE5 );
+			mesh.material.opacityTexture.Bind( 5 );
 		}
 
 		bool hasNormalTexture = mesh.material.normalTexture.IsValid();
@@ -181,7 +181,7 @@ namespace glfr
 		if( hasOpacityTexture )
 		{
 			mesh.material.shader.SetUniformValue( "material.normalTexture", 6 );
-			mesh.material.opacityTexture.Bind( GL_TEXTURE6 );
+			mesh.material.opacityTexture.Bind( 6 );
 		}
 
 		mesh.material.shader.SetUniformValue( "numOfLights", m_numOfLights );

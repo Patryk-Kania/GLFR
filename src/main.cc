@@ -1,5 +1,6 @@
-#include <cstdio>
 #include <cstdlib>
+
+#include <iostream>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -59,9 +60,17 @@ int main()
 	glfr::Mesh floor = glfr::Mesh::NewQuad();
 	glfr::Mesh lightSource = glfr::Mesh::NewCube();
 
-	mesh.material.ambientColor = glfr::Color::Cyan();
-	mesh.material.diffuseColor = glfr::Color::Cyan();
-	mesh.material.specularColor = glfr::Color::Cyan();
+	glfr::Texture2D meshColor = glfr::Texture2D::FromFile( "container_color.png" );
+	mesh.material.ambientTexture = meshColor;
+	mesh.material.diffuseTexture = meshColor;
+	mesh.material.specularTexture = glfr::Texture2D::FromFile( "container_specular.png" );
+
+	glfr::Texture2D floorColor = glfr::Texture2D::FromFile( "floor_diffuse.png" );
+	floor.material.ambientTexture = floorColor; 
+	floor.material.diffuseTexture = floorColor;
+	floor.material.specularTexture = floorColor;
+	floor.material.normalTexture = glfr::Texture2D::FromFile( "floor_normal.png" );
+	floor.material.specularPower = 8;
 
 	lightSource.material.isAffectedByLight = false;
 	lightSource.material.diffuseColor = glfr::Color::Magenta();
@@ -88,11 +97,6 @@ int main()
 		meshTransform = glm::translate( meshTransform, glm::vec3 { 0.0f, -0.5f, -4.0f } );
 		meshTransform = glm::rotate( meshTransform, rotationY, glm::vec3 { 0.f, 1.f, 0.f } );
 
-		glm::mat4 floorTransform = glm::mat4{ 1.0f };
-		floorTransform = glm::translate( floorTransform, glm::vec3{ 0.0f, -1.0f, -2.0f } );
-		floorTransform = glm::rotate( floorTransform, glm::radians(-90.0f), glm::vec3{ 1.0f, 0.0f, 0.0f } );
-		floorTransform = glm::scale( floorTransform, glm::vec3{ 10.0f, 10.0f, 1.0f } );
-
 		glm::mat4 lightSourceTransform = glm::mat4{ 1.0f };
 		lightSourceTransform = glm::translate( lightSourceTransform, glm::vec3{ -2.0f, -0.5f, -4.0f } );
 		lightSourceTransform = glm::scale( lightSourceTransform, glm::vec3{ 0.2f, 0.2f, 0.2f } );
@@ -100,7 +104,18 @@ int main()
 
 		renderer.DrawMesh( mesh, meshTransform );
 		renderer.DrawMesh( lightSource, lightSourceTransform );
-		renderer.DrawMesh( floor, floorTransform );
+
+		for( int x = -5; x < 5; x++)
+		{
+			for( int y = -8; y < 2; y++)
+			{
+				glm::mat4 floorTransform = glm::mat4{ 1.0f };
+				floorTransform = glm::translate( floorTransform, glm::vec3{ x, -1.0f, y } );
+				floorTransform = glm::rotate( floorTransform, glm::radians(-90.0f), glm::vec3{ 1.0f, 0.0f, 0.0f } );
+
+				renderer.DrawMesh( floor, floorTransform );
+			}
+		}
 
 		glfwSwapBuffers( window );
 	}
