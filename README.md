@@ -52,4 +52,4 @@ I might’ve messed up versioning a bit, so I’m skipping v0.2.0.
 ![image](https://github.com/user-attachments/assets/1b5aa000-5520-4984-b63e-5860f50c168c)
 
 ## Whats next:
-**Shadows**!!!
+**Shadows**!!! and **normal mapping** because its broken, we need to calculate TBN matrix :/
