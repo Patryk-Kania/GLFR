@@ -8,9 +8,8 @@
 - Render built-in primitives (e.g., cube, sphere, quad)
 - Material system
 - Support for multiple light sources
-- Simple shadow rendering
+- ~~Simple shadow rendering~~ \[NOT IMPLEMENTED\]
 - Single controllable camera
-- PBR 
 
 ## Development Environment
 
@@ -52,4 +51,4 @@ I might’ve messed up versioning a bit, so I’m skipping v0.2.0.
 ![image](https://github.com/user-attachments/assets/1b5aa000-5520-4984-b63e-5860f50c168c)
 
 ## Whats next:
-**Shadows**!!! and **normal mapping** because its broken, we need to calculate TBN matrix :/
+**normal mapping** because its broken, we need to calculate TBN matrix :/
