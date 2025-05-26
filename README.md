@@ -10,6 +10,7 @@
 - Support for multiple light sources
 - ~~Simple shadow rendering~~ \[NOT IMPLEMENTED\]
 - Single controllable camera
+- ~~Normal mapping~~ \[NOT IMPLEMENTED\]
 
 ## Development Environment
 
@@ -50,5 +51,23 @@ I might’ve messed up versioning a bit, so I’m skipping v0.2.0.
 - Implemented texture loading from files
 ![image](https://github.com/user-attachments/assets/1b5aa000-5520-4984-b63e-5860f50c168c)
 
-## Whats next:
-**normal mapping** because its broken, we need to calculate TBN matrix :/
+### GLFR v1.0.0
+Nothing changed. However i want to go forward so i will stop at this point and implement other things in different projects.
+
+## Recap
+
+### What i learned
+- Learned how to write shaders
+- Got the basics of lighting and material properties working
+- Figured out how to generate meshes from code
+- Picked up the fundamentals of graphics programming overall
+- Learned about RAII and move semantics in C++
+- Got familiar with the Rule of 0 / 3 / 5
+- Practiced using Git and CMake
+- Set up a project structure and workflow that actually feels good to use
+
+### What i want to try next
+- Learn and implement deferred shading
+- Add normal mapping to improve surface detail
+- Work on shadows (directional, point, or both)
+- Start exploring and possibly implement physically based rendering (PBR)
