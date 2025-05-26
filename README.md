@@ -71,3 +71,9 @@ Nothing changed. However i want to go forward so i will stop at this point and i
 - Add normal mapping to improve surface detail
 - Work on shadows (directional, point, or both)
 - Start exploring and possibly implement physically based rendering (PBR)
+
+### References
+- https://learnopengl.com
+- https://www.amazon.pl/OpenGL-Programming-Guide-Official-Learning/dp/0134495497
+- https://www.3dgep.com/forward-plus/#Forward_Rendering
+- https://www.aortiz.me/2018/12/21/CG.html#forward-shading
